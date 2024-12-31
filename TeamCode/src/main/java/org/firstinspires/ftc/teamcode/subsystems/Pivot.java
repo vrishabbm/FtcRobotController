@@ -11,39 +11,38 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.firstinspires.ftc.teamcode.constants.CurrentRobot;
-import org.firstinspires.ftc.teamcode.constants.subsystemConstants.PivotConstants;
+import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
+import org.firstinspires.ftc.teamcode.hardware.configurations.Configuration;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 
 public class Pivot implements Subsystem{
     private DcMotorEx pivotMotor;
     private double currentPosition;
-    PIDFController pidfController;
+    private double setpoint;
+    private PIDFController pidfController;
 
     public Pivot() {
+        pidfController = new PIDFController(RobotHardware.robot.pivotP, RobotHardware.robot.pivotI, RobotHardware.robot.pivotD, 0);
+        pidfController.setTolerance(RobotHardware.robot.pivotPositionTolerance);
     }
 
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        pivotMotor = hardwareMap.get(DcMotorEx.class, PivotConstants.pivotMotorName);
-
+        pivotMotor = hardwareMap.get(DcMotorEx.class, Configuration.pivotMotorName);
         pivotMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivotMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivotMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        pidfController = new PIDFController(CurrentRobot.pivot_kP, CurrentRobot.pivot_kI, CurrentRobot.pivot_kD, 0);
-        pidfController.setTolerance(PivotConstants.PIVOT_POSITION_TOLERANCE);
     }
 
     @Override
     public void sendTelemetry(Telemetry telemetry) {
-        telemetry.addData("Pivot Position", currentPosition);
+        telemetry.addData("Pivot Position (degrees)", currentPosition);
     }
 
     @Override
     public void periodic(Telemetry telemetry) {
-        currentPosition = 360 * pivotMotor.getCurrentPosition()/PivotConstants.PIVOT_MOTOR_TICKS_PER_REV;
+        currentPosition = 360 * pivotMotor.getCurrentPosition()/RobotHardware.robot.pivotTicksPerRev;
     }
 
     @Override
@@ -51,12 +50,39 @@ public class Pivot implements Subsystem{
         pivotMotor.setPower(0);
     }
 
+    //Getters and Setters
+    public double getCurrentPosition() {
+        return currentPosition;
+    }
+
+    public double getSetpoint(double setpoint) {
+        return setpoint;
+    }
+
+    public boolean pivotAtSetpoint() {
+        return Math.abs(currentPosition - setpoint) < RobotHardware.robot.pivotPositionTolerance;
+    }
+
+    public void setSetpoint(double setpoint) {
+        this.setpoint = setpoint;
+    }
+
+    //Actions
     public Action pivotArm(double setpoint) {
+        this.setSetpoint(setpoint);
         class PivotArm implements Action{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                currentPosition = 360 * pivotMotor.getCurrentPosition()/RobotHardware.robot.pivotTicksPerRev;
+
                 pivotMotor.setPower(MathUtil.clamp(pidfController.calculate(currentPosition, setpoint), -1, 1));
-                return Math.abs(currentPosition-setpoint) > PivotConstants.PIVOT_POSITION_TOLERANCE;
+
+                if(Math.abs(currentPosition-setpoint) > RobotHardware.robot.pivotPositionTolerance) {
+                    return true;
+                } else {
+                    pivotMotor.setPower(0);
+                    return false;
+                }
             }
         }
 

@@ -12,12 +12,15 @@ import org.firstinspires.ftc.teamcode.subsystems.Viper;
 import java.util.ArrayList;
 
 public class RobotContainer {
-    public static Pivot pivot = new Pivot();
-    public static Viper viper = new Viper();
+    public static Pivot pivot;
+    public static Viper viper;
 
     public static ArrayList<Subsystem> subsystems;
 
     public static void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
+        pivot = new Pivot();
+        viper = new Viper();
+
         subsystems.add(pivot);
         subsystems.add(viper);
 
@@ -44,11 +47,21 @@ public class RobotContainer {
         }
     }
 
-    public Action reachHighBasket() {
+    public static Action reachHighBasket() {
         return new SequentialAction(
-                viper.extendSlide(0),
-                pivot.pivotArm(90),
-                viper.extendSlide(25)
+                pivot.pivotArm(60),
+                pivot.stopPivot(),
+                viper.moveViper(25),
+                viper.stopViper()
+        );
+    }
+
+    public static Action zeroPivotAndViper() {
+        return new SequentialAction(
+                viper.moveViper(0),
+                viper.stopViper(),
+                pivot.pivotArm(0),
+                pivot.stopPivot()
         );
     }
 }
