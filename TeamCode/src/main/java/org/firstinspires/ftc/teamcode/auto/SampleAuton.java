@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.hardware.Configuration;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.subsystems.Subsystem;
 
@@ -33,6 +34,7 @@ public class SampleAuton extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         RobotHardware.setRobot(RobotHardware.Bot.SUPER_DWARAKA);
+        Configuration.setConfiguration(Configuration.Config.CONFIG_ONE);
         RobotContainer.initialize(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
 
@@ -48,6 +50,6 @@ public class SampleAuton extends LinearOpMode {
                 )
         );
 
-        RobotContainer.stop(telemetry);
+        RobotContainer.stop();
     }
 }

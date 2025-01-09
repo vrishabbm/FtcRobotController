@@ -12,7 +12,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
-import org.firstinspires.ftc.teamcode.hardware.configurations.Configuration;
+import org.firstinspires.ftc.teamcode.hardware.Configuration;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 
@@ -21,6 +21,15 @@ public class Pivot implements Subsystem{
     private double currentPosition;
     private double setpoint;
     private PIDFController pidfController;
+    private static Pivot instance;
+
+    public static Pivot getInstance() {
+        if(instance == null) {
+            instance = new Pivot();
+        }
+
+        return instance;
+    }
 
     public Pivot() {
         pidfController = new PIDFController(RobotHardware.robot.pivotP, RobotHardware.robot.pivotI, RobotHardware.robot.pivotD, 0);
@@ -29,7 +38,7 @@ public class Pivot implements Subsystem{
 
     @Override
     public void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        pivotMotor = hardwareMap.get(DcMotorEx.class, Configuration.pivotMotorName);
+        pivotMotor = hardwareMap.get(DcMotorEx.class, Configuration.config.pivotMotorName);
         pivotMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         pivotMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         pivotMotor.setDirection(DcMotorSimple.Direction.FORWARD);
@@ -41,12 +50,13 @@ public class Pivot implements Subsystem{
     }
 
     @Override
-    public void periodic(Telemetry telemetry) {
+    public void periodic() {
         currentPosition = 360 * pivotMotor.getCurrentPosition()/RobotHardware.robot.pivotTicksPerRev;
+        pivotMotor.setPower(MathUtil.clamp(pidfController.calculate(currentPosition, setpoint), -1, 1));
     }
 
     @Override
-    public void stop(Telemetry telemetry) {
+    public void stop() {
         pivotMotor.setPower(0);
     }
 
@@ -73,14 +83,11 @@ public class Pivot implements Subsystem{
         class PivotArm implements Action{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                currentPosition = 360 * pivotMotor.getCurrentPosition()/RobotHardware.robot.pivotTicksPerRev;
-
-                pivotMotor.setPower(MathUtil.clamp(pidfController.calculate(currentPosition, setpoint), -1, 1));
-
-                if(Math.abs(currentPosition-setpoint) > RobotHardware.robot.pivotPositionTolerance) {
+            Pivot.getInstance().periodic();
+                if(Pivot.getInstance().pivotAtSetpoint()) {
                     return true;
                 } else {
-                    pivotMotor.setPower(0);
+                    Pivot.getInstance().stop();
                     return false;
                 }
             }

@@ -35,15 +35,15 @@ public class RobotContainer {
         }
     }
 
-    public static void periodic(Telemetry telemetry) {
+    public static void periodic() {
         for(Subsystem subsystem: subsystems) {
-            subsystem.periodic(telemetry);
+            subsystem.periodic();
         }
     }
 
-    public static void stop(Telemetry telemetry) {
+    public static void stop() {
         for(Subsystem subsystem: subsystems) {
-            subsystem.stop(telemetry);
+            subsystem.stop();
         }
     }
 

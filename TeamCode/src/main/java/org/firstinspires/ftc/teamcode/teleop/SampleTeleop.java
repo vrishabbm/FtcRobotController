@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.drive.MecanumDrive;
+import org.firstinspires.ftc.teamcode.hardware.Configuration;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 
 import java.util.ArrayList;
@@ -24,6 +25,7 @@ public class SampleTeleop extends OpMode {
     @Override
     public void init() {
         RobotHardware.setRobot(RobotHardware.Bot.SUPER_DWARAKA);
+        Configuration.setConfiguration(Configuration.Config.CONFIG_ONE);
         RobotContainer.initialize(hardwareMap, telemetry);
         drive = new MecanumDrive(hardwareMap, new Pose2d(0,0,0));
     }
@@ -32,7 +34,7 @@ public class SampleTeleop extends OpMode {
     public void loop() {
         drive.setDrivePowers(new PoseVelocity2d(new Vector2d(-gamepad1.left_stick_y, gamepad1.left_stick_x), gamepad1.right_stick_x));
 
-        RobotContainer.periodic(telemetry);
+        RobotContainer.periodic();
 
         if(gamepad2.y) {
             runningActions.add(RobotContainer.reachHighBasket());
@@ -58,6 +60,6 @@ public class SampleTeleop extends OpMode {
 
     @Override
     public void stop() {
-        RobotContainer.stop(telemetry);
+        RobotContainer.stop();
     }
 }

@@ -3,11 +3,20 @@ package org.firstinspires.ftc.teamcode.hardware;
 import org.firstinspires.ftc.teamcode.hardware.robots.RobotHardwareSuperDwaraka;
 
 public class RobotHardware {
-    private static Bot selectedRobot = Bot.SUPER_DWARAKA; //default
-    public static RobotHardware robot = RobotHardware.getInstance();
+    public static RobotHardware robot = Bot.SUPER_DWARAKA.getBot();
 
     public enum Bot{
-        SUPER_DWARAKA
+        SUPER_DWARAKA(RobotHardwareSuperDwaraka.getInstance());
+
+        private final RobotHardware bot;
+
+        private Bot(RobotHardware bot) {
+            this.bot = bot;
+        }
+
+        public RobotHardware getBot() {
+            return this.bot;
+        }
     }
     //Pivot
     public double pivotP;
@@ -29,17 +38,7 @@ public class RobotHardware {
     public double viperPulleyDiameter;
     public double viperInchesPerTick;
 
-    public static RobotHardware getInstance() {
-        switch(RobotHardware.selectedRobot) {
-            case SUPER_DWARAKA:
-                return RobotHardwareSuperDwaraka.getInstance();
-            default:
-                return RobotHardwareSuperDwaraka.getInstance();
-        }
-    }
-
     public static void setRobot(RobotHardware.Bot selectedRobot) {
-        RobotHardware.selectedRobot = selectedRobot;
-        RobotHardware.robot = RobotHardware.getInstance();
+        RobotHardware.robot = selectedRobot.getBot();
     }
 }
