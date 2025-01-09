@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.hardware.Configuration;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
@@ -21,15 +22,6 @@ public class Viper implements Subsystem{
     private double currentPosition;
     private double setpoint;
     private PIDFController pidfController;
-    private static Viper instance;
-
-    public static Viper getInstance() {
-        if(instance == null) {
-            instance = new Viper();
-        }
-
-        return instance;
-    }
 
     public Viper() {
         pidfController = new PIDFController(RobotHardware.robot.viperP, RobotHardware.robot.viperI, RobotHardware.robot.viperD, 0);
@@ -72,18 +64,18 @@ public class Viper implements Subsystem{
     public void setSetpoint(double setpoint) {
         this.setpoint = setpoint;
     }
-    
+
     //Actions
-    public Action moveViper(double setpoint) {
+    public Action setPosition(double setpoint) {
         this.setSetpoint(setpoint);
         class MoveViper implements Action{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                Viper.getInstance().periodic();
+                RobotContainer.viper.periodic();
                 if(pidfController.atSetPoint()) {
                     return true;
                 } else {
-                    Viper.getInstance().stop();
+                    RobotContainer.viper.stop();
                     return false;
                 }
             }

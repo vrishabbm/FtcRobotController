@@ -11,27 +11,19 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.RobotContainer;
 import org.firstinspires.ftc.teamcode.hardware.RobotHardware;
 import org.firstinspires.ftc.teamcode.hardware.Configuration;
 import org.firstinspires.ftc.teamcode.utils.MathUtil;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 
-public class Pivot implements Subsystem{
-    private static Pivot instance;
+public class Pivot implements Subsystem {
 
     //Instance Data
     private DcMotorEx pivotMotor;
     private double currentPosition;
     private double setpoint;
     private PIDFController pidfController;
-
-    public static Pivot getInstance() {
-        if(instance == null) {
-            instance = new Pivot();
-        }
-
-        return instance;
-    }
 
     //Constructor
     public Pivot() {
@@ -77,16 +69,16 @@ public class Pivot implements Subsystem{
     }
 
     //Actions
-    public Action pivotArm(double setpoint) {
+    public Action setPosition(double setpoint) {
         this.setSetpoint(setpoint);
         class PivotArm implements Action{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Pivot.getInstance().periodic();
+            RobotContainer.pivot.periodic();
                 if(pidfController.atSetPoint()) {
                     return true;
                 } else {
-                    Pivot.getInstance().stop();
+                    RobotContainer.pivot.stop();
                     return false;
                 }
             }

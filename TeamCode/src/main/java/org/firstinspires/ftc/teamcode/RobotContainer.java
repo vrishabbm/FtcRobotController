@@ -12,8 +12,8 @@ import org.firstinspires.ftc.teamcode.subsystems.Viper;
 import java.util.ArrayList;
 
 public class RobotContainer {
-    static Pivot pivot = Pivot.getInstance();
-    static Viper viper = Viper.getInstance();
+    public static final Pivot pivot = new Pivot();
+    public static final Viper viper = new Viper();
 
     public static ArrayList<Subsystem> subsystems;
 
@@ -47,18 +47,18 @@ public class RobotContainer {
 
     public static Action reachHighBasket() {
         return new SequentialAction(
-                pivot.pivotArm(60),
+                pivot.setPosition(60),
                 pivot.stopPivot(),
-                viper.moveViper(25),
+                viper.setPosition(25),
                 viper.stopViper()
         );
     }
 
     public static Action zeroPivotAndViper() {
         return new SequentialAction(
-                viper.moveViper(0),
+                viper.setPosition(0),
                 viper.stopViper(),
-                pivot.pivotArm(0),
+                pivot.setPosition(0),
                 pivot.stopPivot()
         );
     }
