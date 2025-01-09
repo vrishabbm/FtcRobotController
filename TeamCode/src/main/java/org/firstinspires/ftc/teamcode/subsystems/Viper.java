@@ -65,10 +65,6 @@ public class Viper implements Subsystem{
         return currentPosition;
     }
 
-    public boolean viperAtSetpoint() {
-        return Math.abs(currentPosition - setpoint) < RobotHardware.robot.viperPositionTolerance;
-    }
-
     public double getSetpoint(double setpoint) {
         return setpoint;
     }
@@ -76,8 +72,7 @@ public class Viper implements Subsystem{
     public void setSetpoint(double setpoint) {
         this.setpoint = setpoint;
     }
-
-
+    
     //Actions
     public Action moveViper(double setpoint) {
         this.setSetpoint(setpoint);
@@ -85,7 +80,7 @@ public class Viper implements Subsystem{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
                 Viper.getInstance().periodic();
-                if(Math.abs(currentPosition-setpoint) > RobotHardware.robot.viperPositionTolerance) {
+                if(pidfController.atSetPoint()) {
                     return true;
                 } else {
                     Viper.getInstance().stop();

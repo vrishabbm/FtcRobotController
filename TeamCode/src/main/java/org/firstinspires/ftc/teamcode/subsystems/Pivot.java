@@ -17,11 +17,13 @@ import org.firstinspires.ftc.teamcode.utils.MathUtil;
 import org.firstinspires.ftc.teamcode.utils.PIDFController;
 
 public class Pivot implements Subsystem{
+    private static Pivot instance;
+
+    //Instance Data
     private DcMotorEx pivotMotor;
     private double currentPosition;
     private double setpoint;
     private PIDFController pidfController;
-    private static Pivot instance;
 
     public static Pivot getInstance() {
         if(instance == null) {
@@ -31,6 +33,7 @@ public class Pivot implements Subsystem{
         return instance;
     }
 
+    //Constructor
     public Pivot() {
         pidfController = new PIDFController(RobotHardware.robot.pivotP, RobotHardware.robot.pivotI, RobotHardware.robot.pivotD, 0);
         pidfController.setTolerance(RobotHardware.robot.pivotPositionTolerance);
@@ -69,10 +72,6 @@ public class Pivot implements Subsystem{
         return setpoint;
     }
 
-    public boolean pivotAtSetpoint() {
-        return Math.abs(currentPosition - setpoint) < RobotHardware.robot.pivotPositionTolerance;
-    }
-
     public void setSetpoint(double setpoint) {
         this.setpoint = setpoint;
     }
@@ -84,7 +83,7 @@ public class Pivot implements Subsystem{
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             Pivot.getInstance().periodic();
-                if(Pivot.getInstance().pivotAtSetpoint()) {
+                if(pidfController.atSetPoint()) {
                     return true;
                 } else {
                     Pivot.getInstance().stop();
