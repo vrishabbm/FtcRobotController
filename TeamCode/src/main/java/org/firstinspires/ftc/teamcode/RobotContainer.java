@@ -12,14 +12,12 @@ import org.firstinspires.ftc.teamcode.subsystems.Viper;
 import java.util.ArrayList;
 
 public class RobotContainer {
-    public static Pivot pivot;
-    public static Viper viper;
+    static Pivot pivot = Pivot.getInstance();
+    static Viper viper = Viper.getInstance();
 
     public static ArrayList<Subsystem> subsystems;
 
     public static void initialize(HardwareMap hardwareMap, Telemetry telemetry) {
-        pivot = new Pivot();
-        viper = new Viper();
 
         subsystems.add(pivot);
         subsystems.add(viper);
